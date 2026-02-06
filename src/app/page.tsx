@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
 import ThemeToggle from "./components/ThemeToggle";
 
 const newsStories = [
@@ -129,6 +129,36 @@ const faqItems = [
   },
 ];
 
+/* ─── Scroll animation hook ─── */
+function useScrollFadeIn() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = el.querySelectorAll(".scroll-fade-in");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+/* ─── FAQ Item ─── */
 function FAQItem({
   question,
   answer,
@@ -156,7 +186,136 @@ function FAQItem({
   );
 }
 
+/* ─── Subscribe Form ─── */
+function SubscribeForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus("success");
+        setMessage(data.message || "You're subscribed!");
+        setEmail("");
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong.");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (status !== "idle" && status !== "loading") setStatus("idle");
+        }}
+        placeholder="you@example.com"
+        required
+        className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted/50 focus:border-accent focus:outline-none"
+      />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-colors hover:bg-accent-dark disabled:opacity-50"
+      >
+        {status === "loading" ? "Subscribing..." : "Subscribe"}
+      </button>
+    </form>
+  );
+}
+
+function SubscribeMessage({ status, message }: { status: string; message: string }) {
+  if (status === "success") {
+    return <p className="mt-4 text-sm text-green-400">{message}</p>;
+  }
+  if (status === "error") {
+    return <p className="mt-4 text-sm text-red-400">{message}</p>;
+  }
+  return <p className="mt-4 text-xs text-muted">Free forever plan. No spam. Unsubscribe anytime.</p>;
+}
+
+/* ─── Main Page ─── */
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subscribeMessage, setSubscribeMessage] = useState("");
+  const newsRef = useScrollFadeIn();
+
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+
+  // Close mobile menu on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMobileMenu();
+    };
+    if (mobileMenuOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen, closeMobileMenu]);
+
+  const handleCtaSubscribe = async (e: FormEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const email = formData.get("email") as string;
+
+    setSubscribeStatus("loading");
+    setSubscribeMessage("");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscribeStatus("success");
+        setSubscribeMessage(data.message || "You're subscribed!");
+        form.reset();
+      } else {
+        setSubscribeStatus("error");
+        setSubscribeMessage(data.error || "Something went wrong.");
+      }
+    } catch {
+      setSubscribeStatus("error");
+      setSubscribeMessage("Network error. Please try again.");
+    }
+  };
+
+  const navLinks = [
+    { href: "#news", label: "Top Stories" },
+    { href: "#pricing", label: "Pricing" },
+    { href: "#faq", label: "FAQ" },
+  ];
+
   return (
     <div className="min-h-screen bg-background font-sans">
       {/* Navigation */}
@@ -171,27 +330,80 @@ export default function Home() {
             </span>
           </div>
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#news" className="text-sm text-muted hover:text-foreground transition-colors">
-              Top Stories
-            </a>
-            <a href="#pricing" className="text-sm text-muted hover:text-foreground transition-colors">
-              Pricing
-            </a>
-            <a href="#faq" className="text-sm text-muted hover:text-foreground transition-colors">
-              FAQ
-            </a>
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <a
               href="#pricing"
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-dark"
+              className="hidden rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-dark sm:inline-block"
             >
               Subscribe
             </a>
+            {/* Hamburger button — mobile only */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface md:hidden"
+              aria-label="Open menu"
+            >
+              <svg className="h-5 w-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div
+            className="mobile-menu-overlay absolute inset-0 bg-black/60"
+            onClick={closeMobileMenu}
+          />
+          <div className="mobile-menu-panel absolute right-0 top-0 flex h-full w-64 flex-col bg-surface border-l border-border">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <span className="text-sm font-bold text-foreground">Menu</span>
+              <button
+                onClick={closeMobileMenu}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-surface-light"
+                aria-label="Close menu"
+              >
+                <svg className="h-4 w-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-col gap-1 p-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className="rounded-lg px-4 py-3 text-sm text-muted hover:bg-surface-light hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <a
+                href="#pricing"
+                onClick={closeMobileMenu}
+                className="mt-3 rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white hover:bg-accent-dark transition-colors"
+              >
+                Subscribe
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden px-6 py-24 md:py-32">
@@ -243,7 +455,7 @@ export default function Home() {
 
       {/* News Section */}
       <section id="news" className="px-6 py-20">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-5xl" ref={newsRef}>
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
               Top 5 AI Stories — January 2026
@@ -254,10 +466,11 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col gap-6">
-            {newsStories.map((story) => (
+            {newsStories.map((story, index) => (
               <article
                 key={story.number}
-                className="card-hover group rounded-2xl border border-border bg-surface p-6 md:p-8"
+                className="scroll-fade-in card-hover group rounded-2xl border border-border bg-surface p-6 md:p-8"
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className="flex flex-col gap-4 md:flex-row md:gap-8">
                   <div className="shrink-0">
@@ -403,19 +616,23 @@ export default function Home() {
                 Join 12,000+ developers who start their week with the most
                 important AI news, curated and summarized for technical minds.
               </p>
-              <div className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
+              <form onSubmit={handleCtaSubscribe} className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
                 <input
                   type="email"
+                  name="email"
                   placeholder="you@example.com"
+                  required
                   className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted/50 focus:border-accent focus:outline-none"
                 />
-                <button className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-colors hover:bg-accent-dark">
-                  Subscribe
+                <button
+                  type="submit"
+                  disabled={subscribeStatus === "loading"}
+                  className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-colors hover:bg-accent-dark disabled:opacity-50"
+                >
+                  {subscribeStatus === "loading" ? "Subscribing..." : "Subscribe"}
                 </button>
-              </div>
-              <p className="mt-4 text-xs text-muted">
-                Free forever plan. No spam. Unsubscribe anytime.
-              </p>
+              </form>
+              <SubscribeMessage status={subscribeStatus} message={subscribeMessage} />
             </div>
           </div>
         </div>

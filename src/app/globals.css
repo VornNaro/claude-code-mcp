@@ -92,3 +92,24 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Scroll-triggered animations */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Mobile menu */
+.mobile-menu-overlay {
+  transition: opacity 0.2s ease;
+}
+
+.mobile-menu-panel {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
