@@ -312,7 +312,6 @@ export default function Home() {
 
   const navLinks = [
     { href: "#news", label: "Top Stories" },
-    { href: "#trending", label: "Trending AI Feature" },
     { href: "#pricing", label: "Pricing" },
     { href: "#faq", label: "FAQ" },
   ];
@@ -503,92 +502,6 @@ export default function Home() {
               — smaller efficient models, physical AI entering real-world
               deployment, and AI becoming deeply personal infrastructure.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Trending AI Feature Section */}
-      <section id="trending" className="px-6 py-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-sm font-medium text-accent-light">
-              <span className="inline-block h-2 w-2 rounded-full bg-accent animate-pulse" />
-              Trending Now
-            </div>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
-              Trending AI Feature
-            </h2>
-            <p className="mx-auto max-w-2xl text-muted">
-              The most talked-about AI capabilities reshaping how developers build, ship, and scale software in 2026.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">AI-Powered Code Generation</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                From GitHub Copilot to Cursor and Claude Code, AI coding assistants have evolved beyond autocomplete into full agentic workflows that can scaffold projects, debug complex issues, and refactor entire codebases autonomously.
-              </p>
-            </div>
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">Local LLMs & On-Device AI</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                The rise of compact models like Falcon-H1R and Llama 3 means developers can now run powerful AI locally. On-device inference is enabling privacy-first applications, offline capabilities, and dramatically reduced API costs.
-              </p>
-            </div>
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">Agentic AI Frameworks</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                Multi-step AI agents are moving from demos to production. Frameworks like LangGraph, CrewAI, and Anthropic&apos;s Agent SDK let developers build autonomous systems that plan, execute, and iterate on complex tasks with minimal human oversight.
-              </p>
-            </div>
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">AI-Native Databases</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                Vector databases and AI-native storage solutions like Pinecone, Weaviate, and pgvector are becoming essential infrastructure. Developers are embedding semantic search and RAG pipelines directly into their application stacks.
-              </p>
-            </div>
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">AI Security & Red Teaming</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                As AI integrates deeper into production systems, security is top of mind. Prompt injection defenses, model auditing tools, and AI red-teaming frameworks are the fastest-growing areas in the developer security ecosystem.
-              </p>
-            </div>
-            <div className="card-hover rounded-2xl border border-border bg-surface p-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-                <svg className="h-6 w-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 4V2m0 2a2 2 0 100 4m0-4a2 2 0 110 4m10-4V2m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-5 6v4m0 0l-3-3m3 3l3-3M3 10h18" />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">AI-Augmented DevOps</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                From intelligent CI/CD pipelines to AI-driven incident response, DevOps is being transformed. Tools now predict deployment failures, auto-generate runbooks, and provide real-time root cause analysis during outages.
-              </p>
-            </div>
           </div>
         </div>
       </section>
